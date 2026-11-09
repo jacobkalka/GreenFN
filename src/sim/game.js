@@ -37,8 +37,13 @@ export class Game {
   }
 
   opponentOf(a) {
-    for (const x of this.athletes) if (x !== a) return x;
+    for (const x of this.athletes) if (x !== a && x.inPlay) return x;
     return null;
+  }
+
+  /** Athletes currently participating (practice can bench the CPU). */
+  get active() {
+    return this.athletes.filter((a) => a.inPlay);
   }
 
   setController(athlete, controller) {
@@ -84,10 +89,11 @@ export class Game {
     ball.prevPos.copy(ball.pos);
     ball.prevRot.copy(ball.rot);
 
-    for (const c of this.controllers) c.update(dt);
+    for (const c of this.controllers) if (c.athlete && c.athlete.inPlay) c.update(dt);
 
     // --- decisions + actions + movement
     for (const a of this.athletes) {
+      if (!a.inPlay) continue;
       a.time += dt;
       a.resetIntent();
       a.basePosture();
@@ -99,7 +105,7 @@ export class Game {
     this._resolveBodies(dt);
 
     // --- ball handling (owned ball)
-    for (const a of this.athletes) a.dribble.update(dt);
+    for (const a of this.athletes) if (a.inPlay) a.dribble.update(dt);
     // held ball follows the action's requested spot (hands are solved onto it)
     if (ball.state === BallState.HELD && ball.owner) {
       const an = ball.owner.anim;
@@ -110,7 +116,7 @@ export class Game {
     }
 
     // --- animation
-    for (const a of this.athletes) a.animator.update(dt);
+    for (const a of this.athletes) if (a.inPlay) a.animator.update(dt);
 
     // --- free ball physics
     if (ball.state === BallState.FREE) {
@@ -118,6 +124,7 @@ export class Game {
       caps.length = 0;
       for (let i = 0; i < this.athletes.length; i++) {
         const a = this.athletes[i];
+        if (!a.inPlay) continue;
         if (ball.noPickupBy === a && ball.noPickupFor > 0) continue;
         caps.push(a.capsule(this.capsules[i]));
       }
@@ -137,7 +144,7 @@ export class Game {
   }
 
   _resolveBodies(dt) {
-    const A = this.athletes;
+    const A = this.active;
     for (let i = 0; i < A.length; i++) {
       for (let j = i + 1; j < A.length; j++) {
         const a = A[i];

@@ -105,6 +105,7 @@ export class Athlete {
     this.id = opts.id || 'p';
     this.name = opts.name || 'Player';
     this.isUser = !!opts.isUser;
+    this.inPlay = true;
     this.team = opts.team || 0;
     this.ratings = Object.assign(
       {

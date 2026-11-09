@@ -450,6 +450,8 @@ export function checkPickups(game, dt) {
   let best = null;
   let bestD = Infinity;
   for (const a of game.athletes) {
+    if (!a.inPlay) continue;
+    if (game.pickupFilter && !game.pickupFilter(a)) continue;
     if (a.action && a.action.type === 'shot') continue;
     if (a.action && a.action.type === 'layup') continue;
     if (a.stumble > 0.15) continue;
