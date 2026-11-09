@@ -152,7 +152,7 @@ export class Animator {
     toLocalYaw(_v2, a.vel.x, a.vel.z, a.yaw);
     const velF = _v2.z;
     const runPosture = smoothstep(2, 6.5, Math.max(0, velF)) * 0.16;
-    const leanFT = clamp(Math.atan2(accF, 9.81) * 0.5 + runPosture + an.leanF, -0.45, 0.6);
+    const leanFT = clamp(Math.atan2(accF, 9.81) * 0.5 + runPosture + an.leanF, -0.22, 0.6);
     const leanST = clamp(Math.atan2(accS, 9.81) * 0.42 + an.leanS, -0.4, 0.4);
     this.leanF.update(dt, leanFT);
     this.leanS.update(dt, leanST);
@@ -204,18 +204,20 @@ export class Animator {
     // lean shifts hips backward a little so the head stays over the base of support
     const lf = this.leanF.x;
     const ls = this.leanS.x;
-    pelvis.position.set(this.shift.x - ls * 0.06, this.pelvisY, -lf * 0.06 - crouch * 0.05 + an.pelvisFwd);
-    _e.set(lf * 0.35 + crouch * 0.18 + an.pelvisPitch, g.hipYaw + this.twist.x * 0.25 + an.hipYaw, -ls * 0.4 + g.hipRoll, 'YXZ');
+    // athletic hinge: crouching folds the upper body forward at the hips (chest over the knees),
+    // hips shift back to keep the center of mass over the feet
+    const hinge = Math.max(0, crouch) * 1.15 * an.hingeScale + lf * 0.45 + an.spineBend;
+    pelvis.position.set(this.shift.x - ls * 0.06, this.pelvisY, -lf * 0.05 - hinge * 0.1 + an.pelvisFwd);
+    _e.set(hinge * 0.38 + an.pelvisPitch, g.hipYaw + this.twist.x * 0.25 + an.hipYaw, -ls * 0.4 + g.hipRoll, 'YXZ');
     pelvis.quaternion.setFromEuler(_e);
 
     // ------------------------------------------------------------ spine / chest
     const spine = rig.j('spine');
     const chest = rig.j('chest');
-    // crouching hinges the torso forward at the hips; chest counter-rotates the hip swing
-    const fwdBend = lf * 0.35 + crouch * 0.42 + an.spineBend;
-    _e.set(fwdBend * 0.55, -g.hipYaw * 0.5 + this.twist.x * 0.35, -ls * 0.3, 'YXZ');
+    // chest counter-rotates the hip swing
+    _e.set(hinge * 0.4, -g.hipYaw * 0.5 + this.twist.x * 0.35, -ls * 0.3, 'YXZ');
     spine.quaternion.setFromEuler(_e);
-    _e.set(fwdBend * 0.45 - crouch * 0.2 + an.chestPitch, -g.hipYaw * 0.6 + this.twist.x * 0.4 + an.chestYaw, -ls * 0.2 + an.chestRoll, 'YXZ');
+    _e.set(hinge * 0.22 + an.chestPitch, -g.hipYaw * 0.6 + this.twist.x * 0.4 + an.chestYaw, -ls * 0.2 + an.chestRoll, 'YXZ');
     chest.quaternion.setFromEuler(_e);
     rig.update();
 
@@ -230,14 +232,14 @@ export class Animator {
       _v1.copy(an.lookAt).applyMatrix4(_inv);
       _v1.y -= DIM.neck + DIM.head + 0.08;
       hy = clamp(Math.atan2(_v1.x, _v1.z), -1.2, 1.2);
-      hp = clamp(-Math.atan2(_v1.y, Math.hypot(_v1.x, _v1.z)), -0.6, 0.7);
+      hp = clamp(-Math.atan2(_v1.y, Math.hypot(_v1.x, _v1.z)), -0.85, 0.7);
     }
     hp += an.headPitch;
     this.headYaw.update(dt, hy);
     this.headPitch.update(dt, hp);
     _e.set(this.headPitch.x * 0.4, this.headYaw.x * 0.4, 0, 'YXZ');
     neck.quaternion.setFromEuler(_e);
-    _e.set(this.headPitch.x * 0.6 - crouch * 0.15, this.headYaw.x * 0.6, 0, 'YXZ');
+    _e.set(this.headPitch.x * 0.6, this.headYaw.x * 0.6, 0, 'YXZ');
     head.quaternion.setFromEuler(_e);
 
     // ------------------------------------------------------------ legs (IK)

@@ -66,6 +66,14 @@ export class CameraRig {
 
   update(dt, game, user, interpAlpha = 1) {
     const cam = this.camera;
+    if (this.mode === 'free') {
+      // debug / test: follow a fixed offset from the user
+      if (this.freeOffset) {
+        cam.position.set(user.pos.x + this.freeOffset.x, this.freeOffset.y, user.pos.z + this.freeOffset.z);
+        cam.lookAt(user.pos.x, this.freeLookY || 1.0, user.pos.z);
+      }
+      return;
+    }
     if (this.mode === 'menu' || this.mode === 'locker') return this._updateShowcase(dt, user);
     const P = CAMERA_PRESETS[this.preset];
     const S = this.settings;

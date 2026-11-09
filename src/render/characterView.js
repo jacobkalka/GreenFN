@@ -222,10 +222,12 @@ export class CharacterView {
     const j = 'hand' + s;
     // palm: thickness along X (palm normal), length along -Y (fingers), width along Z
     this._add(j, new RoundedBoxGeometry(0.032, 0.095, 0.082, 2, 0.012), skin, [0, -0.045, 0]);
-    // fingers, slightly curled toward the palm side
-    this._add(j, new RoundedBoxGeometry(0.026, 0.085, 0.076, 2, 0.011), skin, [-side * 0.006, -0.125, 0], [0, 0, side * 0.22]);
+    // fingers in two segments, curled toward the palm (cupped, never a flat paddle)
+    // (palm faces local -X on the left hand, +X on the right: curl = -side * angle)
+    this._add(j, new RoundedBoxGeometry(0.025, 0.05, 0.074, 2, 0.01), skin, [-side * 0.006, -0.108, 0], [0, 0, -side * 0.42]);
+    this._add(j, new RoundedBoxGeometry(0.022, 0.045, 0.07, 2, 0.009), skin, [-side * 0.03, -0.142, 0], [0, 0, -side * 0.95]);
     // thumb (toward +Z = forward when hanging)
-    this._add(j, new THREE.CapsuleGeometry(0.012, 0.045, 3, 6), skin, [-side * 0.008, -0.055, 0.045], [0.55, 0, side * 0.3]);
+    this._add(j, new THREE.CapsuleGeometry(0.012, 0.042, 3, 6), skin, [-side * 0.004, -0.06, 0.044], [0.5, 0, -side * 0.45]);
   }
 
   _buildShoe(s, upper, sole, accent, sock) {

@@ -1683,7 +1683,7 @@ input[type='range']::-moz-range-thumb {
 }
 .box-table th,
 .box-table td {
-  padding: 9px 10px;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--line);
   font-family: var(--display);
   font-weight: 600;
@@ -1806,6 +1806,20 @@ input[type='range']::-moz-range-thumb {
    Responsive
    ============================================================================================ */
 @media (max-height: 780px) {
+  .end {
+    gap: 12px;
+  }
+  .end-hero .res {
+    font-size: clamp(56px, 7vw, 92px);
+  }
+  .end-hero .final {
+    font-size: 52px;
+  }
+  .box-table th,
+  .box-table td {
+    padding: 5px 10px;
+    font-size: 14.5px;
+  }
   .menu-hero p {
     display: none;
   }

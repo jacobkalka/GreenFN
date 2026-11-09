@@ -200,13 +200,9 @@ export function makeJerseyTexture(opts) {
     g.fillStyle = opts.numberColor || '#fff';
     g.fillText(num, cx, H * 0.5);
   };
-  drawNum(W * 0.75, 132); // back (reads correctly from behind)
-  // front: lathe UVs run right-to-left when viewed from the front, so mirror it
-  g.save();
-  g.translate(W * 0.25, 0);
-  g.scale(-1, 1);
-  drawNum(0, 74);
-  g.restore();
+  // lathe UVs (phiStart -PI/2): u=0.25 is the chest, u=0.75 the back; both read left-to-right
+  drawNum(W * 0.75, 132);
+  drawNum(W * 0.25, 74);
   const map = new THREE.CanvasTexture(c);
   map.colorSpace = THREE.SRGBColorSpace;
   map.anisotropy = 4;

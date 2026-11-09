@@ -63,6 +63,7 @@ function makeAnimIntent() {
     chestYaw: 0,
     chestRoll: 0,
     headPitch: 0,
+    hingeScale: 1,
     lookTarget: new THREE.Vector3(0, 2, 0),
     lookAt: null,
     arms: 'free',
@@ -239,7 +240,7 @@ export class Athlete {
       an.crouch = lerp(0.3, 0.14, smoothstep(2, 6, speed)) + near * 0.1;
       an.stanceWidth = 0.4;
       an.stagger = this.handling === Handling.DRIBBLE ? -this.dribble.hand * 0.12 : 0.1;
-      an.lateral = latFrac * 0.65 * (sprinting ? 0.3 : 1);
+      an.lateral = latFrac * 0.85 * (sprinting ? 0.3 : 1);
       an.lookTarget.set(0, HOOP.rimY - 0.6, 0);
       if (opp && near > 0.3) an.lookTarget.lerp(_v.set(opp.pos.x, 1.5, opp.pos.z), 0.5);
       an.lookAt = an.lookTarget;
@@ -253,6 +254,7 @@ export class Athlete {
         rotateYaw(an.gripFwd, 0, 1, this.yaw);
         an.gripUp.set(0, 1, 0);
         an.crouch = 0.42;
+        an.hingeScale = 0.75;
         an.stanceWidth = 0.44;
         an.stagger = 0.16 * -this.shootHand;
       }
@@ -360,7 +362,7 @@ export class Athlete {
     const sprintSpeed = (offense ? 6.45 : 7.3) + (r.speed - 0.75) * 1.6;
     const slide = 3.65 + (r.defense - 0.72) * 1.3;
     let fwdMax = sprint ? sprintSpeed : jog;
-    let latMax = defense ? slide * m.lateralMul : offense ? 3.9 : 4.4;
+    let latMax = defense ? slide * m.lateralMul : offense ? 3.45 : 4.4;
     let backMax = defense ? 3.2 : offense ? 3.0 : 3.4;
     if (sprint) {
       latMax = Math.max(latMax, defense ? slide : 4.2);

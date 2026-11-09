@@ -129,6 +129,7 @@ export class LayupAction {
       else _v.copy(this.dir);
       a.mods.velOverride = _w.copy(_v).multiplyScalar(sp);
       an.crouch = lerp(0.25, 0.48, smoothstep(0.4, 1, u));
+      an.hingeScale = 0.5;
       an.leanF += 0.12;
       // ball gathered to the chest, protected on the inside
       this._ballPath(u * 0.35);

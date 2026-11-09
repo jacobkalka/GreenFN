@@ -567,13 +567,13 @@ export class Arena {
     this.courtMat.roughness = th.roughness;
     this.courtMat.clearcoat = th.clearcoat;
     this.ribbonMat.color.set(th.accent).lerp(new THREE.Color(1, 1, 1), 0.35).multiplyScalar(1.5);
-    if (th.wood) {
+    if (th.wood && th.wood.join(',') !== this._woodKey) {
+      this._woodKey = th.wood.join(',');
       // re-tint wood by regenerating (cheap, once per theme switch)
       const wood = makeWoodTexture({ base: th.wood, variation: th.flat ? 8 : 26 });
       this.courtMat.map.dispose();
       wood.map.repeat.copy(this.courtMat.map.repeat);
-      this.courtMat.map = wood.map;
-      this.courtMat.needsUpdate = true;
+      this.courtMat.map = wood.map; // same program (map -> map): no recompile needed
     }
   }
 

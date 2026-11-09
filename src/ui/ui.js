@@ -99,6 +99,28 @@ export class UI {
     this.pauseEl.classList.remove('show');
     this.hud.setMode(mode);
     this._show(this.hud.el);
+    if (!this.profile.data.tutorialSeen) this.showQuickStart();
+  }
+
+  showQuickStart() {
+    const app = this.app;
+    app.paused = true;
+    app.game.paused = true;
+    const k = (x) => `<span class="kbd">${x}</span>`;
+    this.pauseEl.innerHTML = `<div class="pause-box" style="width:min(560px,92vw)">
+      <div class="eyebrow">Quick start</div>
+      <h2 style="font-size:46px;margin-bottom:6px">How to hoop</h2>
+      <div class="card" style="padding:16px 18px;line-height:1.9;font-size:15px;color:#c8d0da">
+        <div>${k('W')}${k('A')}${k('S')}${k('D')} move · ${k('Shift')} sprint</div>
+        <div>Hold ${k('Space')} to shoot — <b style="color:var(--green)">release at the top of your jump</b>, when the meter hits the green zone.</div>
+        <div>Tap ${k('Space')} to pump fake · drive + ${k('Space')} for a layup · sprint + ${k('Space')} on an open lane to dunk.</div>
+        <div>${k('J')}${k('K')}${k('L')}${k('U')}${k('I')}${k('O')}${k('H')}${k('N')} dribble moves — chain them to break your defender.</div>
+        <div>Defense: ${k('J')} steal · ${k('Space')} contest, block, rebound.</div>
+        <div style="color:var(--muted);font-size:13.5px">Inside the arc = 1 point, beyond = 2. Clear the ball after a rebound or steal. ${k('Esc')} shows all controls.</div>
+      </div>
+      <button class="btn primary" data-act="qs-done" style="margin-top:6px">Let's go</button>
+    </div>`;
+    this.pauseEl.classList.add('show');
   }
 
   open(page) {
@@ -284,6 +306,12 @@ export class UI {
         break;
       case 'resume':
         this.sound('uiClick');
+        app.resume();
+        break;
+      case 'qs-done':
+        this.sound('uiClick');
+        this.profile.data.tutorialSeen = true;
+        this.profile.save();
         app.resume();
         break;
       case 'restart':
@@ -774,7 +802,7 @@ export class UI {
     const xpRows = summary.xpParts.map(([k, v]) => `<div class="xp-row"><span>${k}</span><b>+${Math.round(v * (DIFF_MULT[info.difficulty] || 1))}</b></div>`).join('');
     const unlocks = [
       ...summary.levelUps.map((u) => `<span class="chip on">Level ${u.level}${u.reward.item ? ' · ' + esc(ITEM[u.reward.item].name) : ''}</span>`),
-      ...summary.achievements.map((a) => `<span class="chip" style="color:var(--gold);border-color:rgba(255,201,74,.5)">${esc(a.name)}</span>`),
+      ...summary.achievements.map((a) => `<span class="chip" style="color:var(--gold);border-color:rgba(255,201,74,.5)">${esc(a.name)} +${a.coins}</span>`),
       ...summary.questsDone.map((q) => `<span class="chip" style="color:var(--green);border-color:rgba(61,255,138,.45)">Quest: ${esc(q.text)}</span>`),
     ].join('');
     const P = this.profile.data;

@@ -188,6 +188,7 @@ export class ShotAction {
       a.mods.accelMul = 0.55;
       const gT = this.t / st.gather;
       an.crouch = lerp(0.35, 0.58, smoothstep(0, 1, gT));
+      an.hingeScale = 0.3;
       an.stanceWidth = 0.42;
       an.stagger = 0.12 * -a.shootHand;
       if (!this.jumped && this.t >= st.gather) {
@@ -243,6 +244,7 @@ export class ShotAction {
       an.releaseHeight = this.relLocal.y + a.pos.y;
       an.shotDir.set(-a.pos.x, 0, -a.pos.z).normalize();
       an.crouch = a.grounded ? 0.32 : -0.05;
+      an.hingeScale = 0.35;
       an.headPitch = -0.15;
       an.lookTarget.set(0, HOOP.rimY, 0);
       an.lookAt = an.lookTarget;
@@ -345,6 +347,7 @@ export class PumpFakeAction {
     a.mods.allowMove = false;
     a.mods.faceYaw = a.yawToRim();
     an.crouch = lerp(0.45, 0.12, up);
+    an.hingeScale = 0.45;
     an.pelvisLift = up * 0.05;
     bodyToWorld(an.ballPos, a, a.shootHand * 0.08, lerp(1.0, 1.82, up), lerp(0.28, 0.2, up));
     an.arms = 'hold';
