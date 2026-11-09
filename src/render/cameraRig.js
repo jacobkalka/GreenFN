@@ -67,7 +67,8 @@ export class CameraRig {
   update(dt, game, user, interpAlpha = 1) {
     const cam = this.camera;
     if (this.mode === 'free') {
-      // debug / test: follow a fixed offset from the user
+      // debug / test: follow a fixed offset from the user; controls stay rim-relative
+      this.yaw = Math.PI;
       if (this.freeOffset) {
         cam.position.set(user.pos.x + this.freeOffset.x, this.freeOffset.y, user.pos.z + this.freeOffset.z);
         cam.lookAt(user.pos.x, this.freeLookY || 1.0, user.pos.z);

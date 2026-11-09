@@ -441,7 +441,7 @@ export class App {
     this.maxDeficit = 0;
     this.view.cameraRig.mode = 'game';
     rules.start(this.user);
-    this.view.cameraRig.snap();
+    this._primeCamera();
     this.ui.showHUD('match');
     this.audio.init();
     this.audio.startAmbience();
@@ -480,12 +480,20 @@ export class App {
     this.perfStreak = 0;
     this.view.cameraRig.mode = 'game';
     rules.start();
-    this.view.cameraRig.snap();
+    this._primeCamera();
     this.ui.showHUD('practice');
     this.audio.init();
     this.audio.startAmbience();
     this.audio.setCrowd(0.2);
     this.input.clearAll();
+  }
+
+  /** Snap the game camera and compute its yaw now, so the first input ticks are camera-relative. */
+  _primeCamera() {
+    const cam = this.view.cameraRig;
+    cam.snap();
+    cam.update(1 / 60, this.game, this.user);
+    this.input.ctrlYaw = undefined;
   }
 
   practiceReset() {
@@ -495,7 +503,7 @@ export class App {
     const x = Math.max(-7, Math.min(7, u.pos.x));
     const z = Math.max(0.6, Math.min(11.5, u.pos.z));
     r.reset(x, z);
-    this.view.cameraRig.snap();
+    this._primeCamera();
   }
 
   togglePause() {

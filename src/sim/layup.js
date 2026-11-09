@@ -26,7 +26,7 @@ export function wantsLayup(game, a) {
 
 export function wantsDunk(game, a) {
   const d = a.distToRim();
-  if (!(d < 3.8 && d > 1.2 && towardRimSpeed(a) > 3.4 && a.input.sprint && a.stamina > 0.2 && a.ratings.vertical >= 0.55)) return false;
+  if (!(d < 4.4 && d > 1.2 && towardRimSpeed(a) > 3.2 && a.input.sprint && a.stamina > 0.2 && a.ratings.vertical >= 0.55)) return false;
   // the lane must be open: no defender planted between the driver and the rim
   const o = game.opponentOf(a);
   if (o) {
@@ -303,10 +303,10 @@ export class LayupAction {
       rotateYaw(_v, h * 0.15, 0.4, a.yaw);
       const sx = a.pos.x + _v.x;
       const sz = a.pos.z + _v.z;
-      const k = smoothstep(0.35, 1, u);
-      const tx = lerp(sx, 0, k * 0.9);
-      const tz = lerp(sz, 0.04, k * 0.9);
-      const y = lerp(1.5 + a.pos.y, HOOP.rimY + 0.32, smoothstep(0, 0.85, u));
+      const k = smoothstep(0.3, 0.95, u);
+      const tx = lerp(sx, 0, k);
+      const tz = lerp(sz, 0, k);
+      const y = lerp(1.5 + a.pos.y, HOOP.rimY + 0.3, smoothstep(0, 0.85, u));
       an.ballPos.set(tx, y, tz);
       an.arms = u < 0.3 ? 'hold' : 'shoot';
       an.shootSide = h;
@@ -322,7 +322,7 @@ export class LayupAction {
         ball.state = BallState.FREE;
         ball.live = true;
         ball.resetFlags();
-        ball.vel.set(-ball.pos.x * 2.2, -5.2, -ball.pos.z * 2.2);
+        ball.vel.set(-ball.pos.x * 4, -5.2, -ball.pos.z * 4);
         // heavy contest can turn it into a rattle out
         if (Math.random() < contest * 0.6) {
           ball.vel.x += (Math.random() - 0.5) * 3.2;
