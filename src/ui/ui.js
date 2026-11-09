@@ -629,7 +629,7 @@ export class UI {
       </div>
       <div class="section-title"><span class="eyebrow">Level rewards</span></div><div class="track">${track}</div>
       <div class="section-title" style="margin-top:24px"><span class="eyebrow">Unlocks at level ${D.level + 1}</span></div>
-      <p style="color:var(--muted)">${nextItems.length ? nextItems.map((i) => esc(i.name)).join(' · ') : 'Coins and bragging rights.'}</p>
+      <p style="color:var(--muted)">${nextItems.length ? nextItems.map((i) => `${esc(i.name)} <span style="color:var(--dim)">(${esc(CATEGORIES.find((c) => c.id === i.cat)?.name || i.cat)})</span>`).join(' · ') : 'Coins and bragging rights.'}</p>
       <div class="section-title" style="margin-top:24px"><span class="eyebrow">How rewards work</span></div>
       <p style="color:var(--muted);line-height:1.6;max-width:720px">Every game pays XP and coins: more for wins, points, perfect releases and defensive plays, multiplied by difficulty (Rookie 0.8× up to Legend 1.8×). Win streaks add bonus XP. Coins buy cosmetics in the Shop; nothing you buy changes your ratings.</p>
     </div>`;

@@ -546,6 +546,7 @@ export class Arena {
     for (let i = 0; i < 18; i++) {
       const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
       s.scale.setScalar(0.5);
+      s.visible = false;
       this.group.add(s);
       this.flashes.push({ s, t: 0, life: 0 });
     }
@@ -588,12 +589,16 @@ export class Arena {
         f.t += dt;
         const k = 1 - f.t / f.life;
         f.s.material.opacity = Math.max(0, k * k);
-        if (f.t >= f.life) f.life = 0;
+        if (f.t >= f.life) {
+          f.life = 0;
+          f.s.visible = false;
+        }
       } else if (Math.random() < dt * (0.08 + hype * 1.5)) {
         const seat = this.seatList[(Math.random() * this.seatList.length) | 0];
         f.s.position.set(seat[0], seat[1] + 1.0, seat[2]);
         f.t = 0;
         f.life = 0.12 + Math.random() * 0.1;
+        f.s.visible = true;
       }
     }
   }

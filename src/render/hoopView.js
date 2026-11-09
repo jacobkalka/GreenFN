@@ -1,6 +1,7 @@
 // Hoop: stanchion, glass backboard, rim and a verlet-simulated diamond-mesh net.
 import * as THREE from 'three';
 import { HOOP, BALL } from '../sim/constants.js';
+import { BufferGeometryUtils } from 'three/addons';
 
 const _a = new THREE.Vector3();
 const _b = new THREE.Vector3();
@@ -247,6 +248,7 @@ export class HoopView {
       hook.position.set(Math.cos(ang) * HOOP.rimR, HOOP.rimY - 0.015, Math.sin(ang) * HOOP.rimR);
       g.add(hook);
     }
+    this._mergeStatic(g);
     // net
     const center = new THREE.Vector3(0, HOOP.rimY - 0.012, 0);
     this.net = new NetSim(center);
@@ -261,6 +263,37 @@ export class HoopView {
     this._local = new THREE.Vector3();
     this._localV = new THREE.Vector3();
     this.rimShake = 0;
+  }
+
+  /** Merge static parts sharing a material (frame bars, hooks, stanchion) into single draws. */
+  _mergeStatic(g) {
+    const groups = new Map();
+    for (const m of g.children) {
+      if (!m.isMesh || m === this.rim || m.material.transparent) continue;
+      const k = m.material.uuid;
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(m);
+    }
+    for (const list of groups.values()) {
+      if (list.length < 2) continue;
+      const geos = list.map((m) => {
+        m.updateMatrix();
+        const geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+        for (const n of Object.keys(geo.attributes)) if (n !== 'position' && n !== 'normal' && n !== 'uv') geo.deleteAttribute(n);
+        geo.applyMatrix4(m.matrix);
+        return geo;
+      });
+      const merged = BufferGeometryUtils.mergeGeometries(geos, false);
+      if (!merged) continue;
+      const mesh = new THREE.Mesh(merged, list[0].material);
+      mesh.castShadow = list.some((m) => m.castShadow);
+      mesh.receiveShadow = true;
+      for (const m of list) {
+        g.remove(m);
+        m.geometry.dispose();
+      }
+      g.add(mesh);
+    }
   }
 
   update(dt, ball) {

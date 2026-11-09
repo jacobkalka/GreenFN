@@ -1,7 +1,7 @@
 // Character mesh built on the procedural rig. Mirrors the simulation rig's joint hierarchy and
 // interpolates joint transforms between the last two simulation ticks for smooth rendering.
 import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/addons';
+import { RoundedBoxGeometry, BufferGeometryUtils } from 'three/addons';
 import { JOINTS, DIM, POSE_STRIDE } from '../sim/rig.js';
 import { makeJerseyTexture } from './textures.js';
 
@@ -183,6 +183,51 @@ export class CharacterView {
       this._add('shin' + s, limbGeo(DIM.shin * 0.42, [[0, 0.043], [0.6, 0.037], [1, 0.034]], 14), sock, [0, -DIM.shin * 0.58, 0]);
       this._buildShoe(s, shoeUpper, shoeSole, shoeAccent, sock);
     }
+    this._mergeStatic();
+  }
+
+  /** Merge every joint's static meshes per material: ~45 draw calls -> ~25 per character. */
+  _mergeStatic() {
+    const merged = [];
+    for (const j of this.joints) {
+      const groups = new Map();
+      for (const m of j.children) {
+        if (!m.isMesh) continue;
+        const key = m.material.uuid;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(m);
+      }
+      for (const list of groups.values()) {
+        if (list.length < 2) {
+          merged.push(...list);
+          continue;
+        }
+        const geos = list.map((m) => {
+          m.updateMatrix();
+          const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+          for (const name of Object.keys(g.attributes)) if (name !== 'position' && name !== 'normal' && name !== 'uv') g.deleteAttribute(name);
+          if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+          g.applyMatrix4(m.matrix);
+          return g;
+        });
+        const geo = BufferGeometryUtils.mergeGeometries(geos, false);
+        for (const g of geos) g.dispose();
+        if (!geo) {
+          merged.push(...list);
+          continue;
+        }
+        const mesh = new THREE.Mesh(geo, list[0].material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        for (const m of list) {
+          j.remove(m);
+          m.geometry.dispose();
+        }
+        j.add(mesh);
+        merged.push(mesh);
+      }
+    }
+    this.meshes = merged;
   }
 
   _buildHead(look, skin, hair, dark, trim) {
