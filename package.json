@@ -1,0 +1,14 @@
+{
+  "name": "greenfn",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GreenFN - a 1v1 3D basketball game under the lights. Static site, runs on GitHub Pages.",
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "test": "node tests/run.mjs"
+  },
+  "devDependencies": {
+    "three": "0.187.0"
+  }
+}
