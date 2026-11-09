@@ -2,7 +2,7 @@
 // stats, settings), pause menu, end-of-game screen, toasts. Plain DOM, event delegation.
 import { el, esc, fmt, ICON, LOGO_MARK } from './dom.js';
 import { HUD } from './hud.js';
-import { ITEMS, ITEM, CATEGORIES, RARITY, DEFAULT_EQUIPPED, slotOf, lookFromProfile } from '../meta/catalog.js';
+import { ITEMS, ITEM, CATEGORIES, RARITY, slotOf, lookFromProfile } from '../meta/catalog.js';
 import { MILESTONES, ACHIEVEMENTS, xpForLevel, levelReward, DIFF_MULT, DEFAULT_SETTINGS } from '../meta/profile.js';
 import { AI_LEVELS } from '../sim/ai.js';
 import { JUMPSHOTS } from '../sim/shooting.js';

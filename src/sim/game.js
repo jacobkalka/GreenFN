@@ -2,10 +2,9 @@
 import * as THREE from 'three';
 import { Ball, BallPhysics, BallState } from './ball.js';
 import { Athlete, Handling } from './athlete.js';
-import { PLAYER, BALL, SIM_DT, BALL_SUBSTEPS, HOOP } from './constants.js';
+import { PLAYER, SIM_DT, BALL_SUBSTEPS } from './constants.js';
 import { handleAthleteInput, updateAction, checkPickups, startShot } from './actions.js';
 import { tryBlock } from './defense.js';
-import { clamp } from '../core/math.js';
 
 const _d = new THREE.Vector3();
 const _v = new THREE.Vector3();

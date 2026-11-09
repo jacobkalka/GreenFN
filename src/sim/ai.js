@@ -4,11 +4,10 @@
 // shot timing and defensive discipline.
 import * as THREE from 'three';
 import { BallState } from './ball.js';
-import { Handling } from './athlete.js';
-import { COURT, HOOP, isBeyondArc } from './constants.js';
+import { COURT, isBeyondArc } from './constants.js';
 import { MOVES } from './moves.js';
 import { StumbleAction } from './defense.js';
-import { clamp, clamp01, lerp, gaussian, rotateYaw, toLocalYaw, yawOf, smoothstep } from '../core/math.js';
+import { clamp, clamp01, lerp, gaussian, rotateYaw, toLocalYaw, yawOf } from '../core/math.js';
 
 export const AI_LEVELS = {
   rookie: { name: 'Rookie', reaction: 0.3, iq: 0.3, steal: 0.25, contest: 0.45, timing: 0.085, shotIQ: 0.42, moveRate: 0.55, aggression: 0.45, rating: 0.62, speed: 0.62 },

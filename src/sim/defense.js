@@ -2,9 +2,8 @@
 // goaltending resolution against the ball.
 import * as THREE from 'three';
 import { BallState } from './ball.js';
-import { Handling } from './athlete.js';
 import { BALL, HOOP } from './constants.js';
-import { clamp, clamp01, lerp, smoothstep, bell, rotateYaw, toLocalYaw } from '../core/math.js';
+import { clamp01, lerp, bell, toLocalYaw } from '../core/math.js';
 
 const _v = new THREE.Vector3();
 const _w = new THREE.Vector3();

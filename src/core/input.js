@@ -1,6 +1,5 @@
 // Keyboard + gamepad input. Produces an Intent for the user's athlete each simulation tick.
 // Edge-triggered presses are queued and consumed exactly once (robust to multiple ticks per frame).
-import { clamp } from './math.js';
 
 export const MOVE_KEYS = {
   KeyJ: 'cross',

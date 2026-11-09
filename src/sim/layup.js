@@ -3,9 +3,9 @@
 import * as THREE from 'three';
 import { BallState } from './ball.js';
 import { Handling } from './athlete.js';
-import { HOOP, BALL, isBeyondArc } from './constants.js';
+import { HOOP, isBeyondArc } from './constants.js';
 import { perfectWindow, gradeRelease, computeContest, launchShot } from './shooting.js';
-import { clamp, clamp01, lerp, smoothstep, rotateYaw, toLocalYaw, yawOf, bell, easeOut } from '../core/math.js';
+import { clamp, clamp01, lerp, smoothstep, rotateYaw, toLocalYaw, yawOf } from '../core/math.js';
 
 const _v = new THREE.Vector3();
 const _w = new THREE.Vector3();

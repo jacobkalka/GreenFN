@@ -6,9 +6,7 @@ import * as THREE from 'three';
 import { Gait } from './gait.js';
 import { DIM, handQuat } from './rig.js';
 import { BALL } from './constants.js';
-import {
-  clamp, clamp01, lerp, damp, smoothstep, Spring, Spring3, angleDiff, rotateYaw, toLocalYaw, bell,
-} from '../core/math.js';
+import { clamp, clamp01, lerp, smoothstep, Spring, Spring3, rotateYaw, toLocalYaw } from '../core/math.js';
 
 const AX_X = new THREE.Vector3(1, 0, 0);
 const AX_Y = new THREE.Vector3(0, 1, 0);

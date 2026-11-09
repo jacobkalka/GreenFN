@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { makeSpec } from './dribble.js';
 import { Handling } from './athlete.js';
-import { clamp, clamp01, lerp, smoothstep, bell, rotateYaw, toLocalYaw, yawOf, easeInOut } from '../core/math.js';
+import { clamp, clamp01, lerp, smoothstep, bell, rotateYaw, easeInOut } from '../core/math.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const _v = new THREE.Vector3();

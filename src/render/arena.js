@@ -1,7 +1,7 @@
 // Arena: hardwood court with analytic markings, lighting, environment reflections, stands, crowd,
 // LED ribbons, light beams and both hoops.
 import * as THREE from 'three';
-import { COURT, HOOP } from '../sim/constants.js';
+import { COURT } from '../sim/constants.js';
 import { makeWoodTexture, makeRibbonTexture, makeWordmarkTexture, makeRadialSprite } from './textures.js';
 import { HoopView } from './hoopView.js';
 import { mulberry32 } from '../core/math.js';

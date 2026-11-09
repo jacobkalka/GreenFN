@@ -1859,6 +1859,36 @@ input[type='range']::-moz-range-thumb {
     background: rgba(3, 4, 6, 0.94);
   }
 }
+@media (max-width: 1100px) {
+  .sb-team {
+    min-width: 128px;
+    padding: 0 12px;
+    gap: 10px;
+  }
+  .sb-team .pts {
+    font-size: 36px;
+    min-width: 40px;
+  }
+  .sb-team .nm {
+    font-size: 15px;
+  }
+  .stamina {
+    bottom: 96px;
+    width: 170px;
+  }
+}
+@media (max-width: 900px) {
+  .mode-tag {
+    display: none;
+  }
+  .scoreboard {
+    left: 18px;
+    transform: none;
+  }
+  .hints .hrow.moves {
+    display: none;
+  }
+}
 @media (max-width: 640px) {
   .topbar {
     padding: 14px 16px;

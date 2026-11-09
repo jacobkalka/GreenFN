@@ -1,8 +1,8 @@
 // Broadcast-quality follow camera. Always frames the action toward the active basket from the
 // half-court side: behind the user's player on offense, behind the ball handler on defense.
 import * as THREE from 'three';
-import { HOOP, COURT } from '../sim/constants.js';
-import { Spring3, clamp, lerp, damp, smoothstep } from '../core/math.js';
+import { COURT } from '../sim/constants.js';
+import { Spring3, clamp, lerp, damp } from '../core/math.js';
 import { BallState } from '../sim/ball.js';
 
 export const CAMERA_PRESETS = {

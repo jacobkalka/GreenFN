@@ -3,8 +3,8 @@
 // launch velocity for it. Rim/backboard physics then decide makes and misses.
 import * as THREE from 'three';
 import { solveShot, BallState } from './ball.js';
-import { HOOP, BALL, isBeyondArc } from './constants.js';
-import { clamp, clamp01, lerp, gaussian, smoothstep } from '../core/math.js';
+import { HOOP, isBeyondArc } from './constants.js';
+import { clamp01, lerp, gaussian } from '../core/math.js';
 
 // Cosmetic jump-shot styles. Timing differs, difficulty is identical (window sizes are equal).
 export const JUMPSHOTS = {

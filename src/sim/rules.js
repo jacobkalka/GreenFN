@@ -2,9 +2,8 @@
 // and practice mode (free shooting with a rebounder and an optional defender).
 import * as THREE from 'three';
 import { BallState } from './ball.js';
-import { Handling } from './athlete.js';
-import { COURT, HOOP, BALL, isBeyondArc, inCourtBounds } from './constants.js';
-import { clamp, yawOf } from '../core/math.js';
+import { isBeyondArc, inCourtBounds } from './constants.js';
+import { yawOf } from '../core/math.js';
 
 export function newStats() {
   return {
@@ -352,6 +351,18 @@ export class MatchRules {
       this._toDead(next, 'Out of bounds', 1.3);
       return;
     }
+    // stuck ball (resting on the backboard / wedged at the rim): dead ball to the non-shooter
+    if (ball.state === BallState.FREE && ball.pos.y > 2.4 && ball.vel.lengthSq() < 0.05) {
+      this._stuckT = (this._stuckT || 0) + dt;
+      if (this._stuckT > 1.5) {
+        this._stuckT = 0;
+        const last = ball.shot ? ball.shot.shooter : ball.lastTouch;
+        this._event('stuck', last);
+        game.releaseBall();
+        this._toDead(last ? game.opponentOf(last) : off, 'Held ball', 1.2);
+        return;
+      }
+    } else this._stuckT = 0;
     // time limit
     if (this.timeLimit > 0 && this.gameTime >= this.timeLimit && !this.suddenDeath) {
       const [a, b] = this.players;
