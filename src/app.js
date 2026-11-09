@@ -236,6 +236,12 @@ export class App {
         this.emoteUsed = false;
         this.view.cameraRig.pulse(e.value === 2 ? 1 : 0.6);
         if (this.mode === 'practice') this.profile.questProgress('practiceMake', 1);
+        if (this.mode === 'match' && Math.random() < 0.55) {
+          const c = this.cpu;
+          setTimeout(() => {
+            if (this.mode === 'match' && !c.action && this.game.rules && this.game.rules.state === 'dead') c.setAction(new EmoteAction(c, 'hips'));
+          }, 500);
+        }
       } else if (this.mode === 'match' && Math.random() < 0.35) {
         const c = this.cpu;
         setTimeout(() => {
@@ -258,6 +264,16 @@ export class App {
         if (winner === this.user) fx.confetti(0, 4, 5, ['#2ad4ff', '#3dff8a', '#ffffff', '#ffc94a'], 160);
       }, 500);
       setTimeout(() => this._endMatch(e), 2600);
+    });
+    // hide check-ball repositioning behind a quick fade; camera snaps while black
+    ev.on('rules:preCheck', () => {
+      if (this.mode === 'match') this.ui.fade(true);
+    });
+    ev.on('rules:state', (e) => {
+      if (e.state === 'check' && this.mode === 'match') {
+        this._primeCamera();
+        setTimeout(() => this.ui.fade(false), 140);
+      }
     });
     ev.on('achievement', (e) => this.ui.toast(`Achievement · ${e.achievement.name}`, 'gold'));
     ev.on('quest:complete', (e) => {

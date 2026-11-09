@@ -145,6 +145,7 @@ export class MatchRules {
 
   _toCheck(offense) {
     this._oobBall = false;
+    this._preChecked = false;
     this.offense = offense;
     this.clearNeeded = false;
     this.shotClock = this.shotClockLen;
@@ -303,6 +304,11 @@ export class MatchRules {
       return;
     }
     if (this.state === 'dead') {
+      // warn the presentation layer just before players are repositioned (fade to black)
+      if (!this._preChecked && this.stateT >= this.deadDelay - 0.26) {
+        this._preChecked = true;
+        this.events.emit('rules:preCheck', {});
+      }
       if (this.stateT >= this.deadDelay) this._toCheck(this.pendingPossession);
       return;
     }

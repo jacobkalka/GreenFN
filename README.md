@@ -54,7 +54,8 @@ The site is fully static (vendored Three.js, local fonts, synthesized audio), so
 1. Push this repository to GitHub.
 2. In the repository, open **Settings → Pages**.
 3. Under **Build and deployment**, choose **Source: Deploy from a branch**.
-4. Pick the branch that contains the game (for example `main`) and the **/ (root)** folder, then **Save**.
+4. Pick the branch that contains the game (for example `main`, or `claude/modest-tesla-poay3n`)
+   and the **/ (root)** folder, then **Save**.
 5. After a minute the game is live at `https://<user>.github.io/<repo>/`.
 
 `.nojekyll` is included so GitHub serves every file as-is.
@@ -101,6 +102,7 @@ tools/serve.mjs       tiny static server
 
 ```bash
 npm install            # three, for running the simulation in Node
+npm test               # full headless suite (below, with assertions)
 node tests/moves.test.mjs      # every dribble move executes, switches hands, keeps the dribble
 node tests/shotcal.mjs 300     # Monte Carlo make rates by distance / release / contest
 node tests/aivai.mjs pro pro 3 # full AI-vs-AI games through the real rules

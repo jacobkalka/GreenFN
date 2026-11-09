@@ -85,6 +85,7 @@ export class UI {
   }
 
   showMenu() {
+    this.fade(false);
     this.stack = [];
     this.page = null;
     this.endEl.classList.remove('show');
@@ -94,6 +95,7 @@ export class UI {
   }
 
   showHUD(mode) {
+    this.fade(false);
     this.stack = [];
     this.endEl.classList.remove('show');
     this.pauseEl.classList.remove('show');
@@ -790,6 +792,7 @@ export class UI {
   }
 
   showEnd(d) {
+    this.fade(false);
     const { info, us, them, summary } = d;
     const app = this.app;
     const won = info.won;
