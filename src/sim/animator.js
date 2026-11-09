@@ -89,6 +89,7 @@ export class Animator {
       heightScale: 1,
       airTuck: 0,
       airTuckFwd: 0,
+      airTuckSide: 0,
     };
     this.flutter = Math.random() * 10;
     this.initialized = false;
@@ -136,6 +137,7 @@ export class Animator {
     b.heightScale = an.stepHeight;
     b.airTuck = an.airTuck;
     b.airTuckFwd = an.airTuckFwd;
+    b.airTuckSide = an.airTuckSide;
     this.gait.lockedFoot = an.lockFoot === 1 ? this.gait.L : an.lockFoot === -1 ? this.gait.R : null;
     this.gait.update(dt, b);
 

@@ -115,7 +115,7 @@ export function errorModel(info) {
   // contest, movement and fatigue still matter on a perfect release (less so)
   const perfect = grade.id === 'perfect';
   const k = perfect ? 0.55 : 1;
-  sigma *= 1 + contest * 1.1 * k;
+  sigma *= 1 + contest * (kind === 'layup' ? 1.7 : 1.1) * k;
   sigma *= 1 + Math.min(1.2, moveSpeed * 0.09) * k;
   if (stamina < 0.5) sigma *= 1 + (0.5 - stamina) * 0.6 * k;
   sigma *= info.typeMul || 1;

@@ -279,6 +279,12 @@ export class DribbleController {
     const spec = this.cur;
     const nextHand = this._computeRelease(spec);
     ball.vel.copy(this.relVel);
+    if (spec.fumble) {
+      // lost the handle: the ball squirts away
+      const s = Math.random() < 0.5 ? -1 : 1;
+      ball.vel.x += s * (1.6 + Math.random()) * Math.cos(this.a.yaw);
+      ball.vel.z += -s * (1.6 + Math.random()) * Math.sin(this.a.yaw);
+    }
     // no-slip spin: floor contact preserves horizontal velocity (predictable bounce)
     ball.angVel.set(ball.vel.z, 0, -ball.vel.x).multiplyScalar(1 / R);
     this.contact = false;
@@ -329,7 +335,7 @@ export class DribbleController {
     if (spec.catchLocal) _c.copy(spec.catchLocal);
     else this._defaultCatchLocal(_c, this.hand);
     this._localToWorld(_w, _c, _p, yaw);
-    const steer = spec.steer * (this.bounced ? 1.7 : 1) * dt;
+    const steer = (spec.fumble ? 0 : spec.steer) * (this.bounced ? 1.7 : 1) * dt;
     let dx = (_w.x - ball.pos.x) / tRem - ball.vel.x;
     let dz = (_w.z - ball.pos.z) / tRem - ball.vel.z;
     const dl = Math.hypot(dx, dz);

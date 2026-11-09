@@ -143,8 +143,9 @@ export class Gait {
       }
       // feet hang under the hips, slightly tucked, following the body
       for (const f of this.feet) {
-        rotateYaw(_v, f.side * 0.13, f.side * 0.05 + body.airTuckFwd * (f.side > 0 ? 1 : -0.4), body.yaw);
-        const tuck = body.airTuck * (f.side > 0 ? 1 : 0.6);
+        const lead = body.airTuckSide ? (f.side === body.airTuckSide ? 1 : -0.6) : f.side > 0 ? 1 : -0.4;
+        rotateYaw(_v, f.side * 0.13, f.side * 0.05 + body.airTuckFwd * lead, body.yaw);
+        const tuck = body.airTuck * (f.side === body.airTuckSide ? 1 : body.airTuckSide ? 0.3 : 0.75);
         f.pos.set(body.pos.x + _v.x, body.pos.y + 0.0 + tuck * 0.22, body.pos.z + _v.z);
         f.yaw = body.yaw + f.side * 0.12;
         f.pitch = 0.35 + tuck * 0.3;

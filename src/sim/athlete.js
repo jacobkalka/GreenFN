@@ -90,6 +90,7 @@ function makeAnimIntent() {
     poseStiff: 10,
     airTuck: 0,
     airTuckFwd: 0,
+    airTuckSide: 0,
     lockFoot: 0,
   };
 }
@@ -152,7 +153,7 @@ export class Athlete {
     this.impulse = new THREE.Vector3();
     this.desiredVel = new THREE.Vector3();
     this.accelLimit = 10;
-    this.mods = { speedMul: 1, accelMul: 1, turnMul: 1, allowMove: true, faceYaw: null, sprintOk: true, lateralMul: 1 };
+    this.mods = { speedMul: 1, accelMul: 1, turnMul: 1, allowMove: true, faceYaw: null, sprintOk: true, lateralMul: 1, yawOverride: null, velOverride: null };
     this.anim = makeAnimIntent();
     this.dribbleStyle = { side: 0.3, height: 0.9, fwd: 0.22, uCatch: 1.2, contactDur: 0.11 };
     this.rig = new Rig();
@@ -209,6 +210,8 @@ export class Athlete {
     m.faceYaw = null;
     m.sprintOk = true;
     m.lateralMul = 1;
+    m.yawOverride = null;
+    m.velOverride = null;
   }
 
   /** Yaw facing the rim from the current position. */
@@ -277,6 +280,11 @@ export class Athlete {
       an.arms = engage > 0.25 ? 'defend' : 'free';
       // high hand on the opponent's ball side (mirror), low hand digs
       an.highHand = opp && opp.dribble ? -opp.dribble.hand : 1;
+      // shooter rising: hands go straight up (contest without jumping)
+      if (opp.action && (opp.action.type === 'shot' || opp.action.type === 'layup') && d < 2.4) {
+        an.arms = 'contest';
+        an.crouch = 0.25;
+      }
     } else {
       an.crouch = lerp(0.18, 0.12, smoothstep(2, 6, speed));
       an.stanceWidth = 0.36;
@@ -331,17 +339,24 @@ export class Athlete {
       if (Math.hypot(b.x - this.pos.x, b.z - this.pos.z) > 0.6) faceYaw = yawOf(b.x - this.pos.x, b.z - this.pos.z);
     }
 
-    const turnMax = lerp(11, 5.2, clamp01(speed / 7)) * m.turnMul * (this.grounded ? 1 : 0.15);
-    const w = 2 * Math.PI * 3.1;
-    const diff = angleDiff(this.yaw, faceYaw);
-    this.yawRate += (w * w * diff - 2 * 0.95 * w * this.yawRate) * dt;
-    this.yawRate = clamp(this.yawRate, -turnMax, turnMax);
-    this.yaw = wrapAngle(this.yaw + this.yawRate * dt);
+    if (m.yawOverride !== null) {
+      // scripted rotation (spin moves): yaw follows the action exactly
+      const ny = wrapAngle(m.yawOverride);
+      this.yawRate = angleDiff(this.yaw, ny) / dt;
+      this.yaw = ny;
+    } else {
+      const turnMax = lerp(11, 5.2, clamp01(speed / 7)) * m.turnMul * (this.grounded ? 1 : 0.15);
+      const w = 2 * Math.PI * 3.1;
+      const diff = angleDiff(this.yaw, faceYaw);
+      this.yawRate += (w * w * diff - 2 * 0.95 * w * this.yawRate) * dt;
+      this.yawRate = clamp(this.yawRate, -turnMax, turnMax);
+      this.yaw = wrapAngle(this.yaw + this.yawRate * dt);
+    }
 
     // ---------------------------------------------------------------- target velocity
     const fatigue = this.stamina < 0.3 ? lerp(0.86, 1, this.stamina / 0.3) : 1;
     const jog = (offense ? 4.35 : 4.7) + (r.speed - 0.75) * 1.2;
-    const sprintSpeed = (offense ? 6.75 : 7.2) + (r.speed - 0.75) * 1.6;
+    const sprintSpeed = (offense ? 6.45 : 7.3) + (r.speed - 0.75) * 1.6;
     const slide = 3.65 + (r.defense - 0.72) * 1.3;
     let fwdMax = sprint ? sprintSpeed : jog;
     let latMax = defense ? slide * m.lateralMul : offense ? 3.9 : 4.4;
@@ -355,11 +370,12 @@ export class Athlete {
     const lz = _l.z;
     const zMax = lz >= 0 ? fwdMax : backMax;
     const maxAlong = 1 / Math.sqrt((lx * lx) / (latMax * latMax) + (lz * lz) / (zMax * zMax) + 1e-9);
-    const desiredSpeed = mag * maxAlong * m.speedMul * fatigue;
+    const balance = this.offBalance > 0 ? 0.55 : 1; // off-balance after a bite / missed reach
+    const desiredSpeed = mag * maxAlong * m.speedMul * fatigue * balance;
 
     // ---------------------------------------------------------------- acceleration limits
     const accelBase = (defense ? 12.5 : 9.6) + (r.accel - 0.75) * 4;
-    const aAcc = accelBase * (1 - 0.55 * Math.pow(clamp01(speed / sprintSpeed), 2)) * m.accelMul * fatigue;
+    const aAcc = accelBase * (1 - 0.55 * Math.pow(clamp01(speed / sprintSpeed), 2)) * m.accelMul * fatigue * (balance < 1 ? 0.6 : 1);
     const aBrake = (defense ? 17 : 14.5) * m.accelMul;
     const aTurn = (defense ? 14 : 11) * m.accelMul;
     const dvx = mv.x * desiredSpeed - this.vel.x;
@@ -396,6 +412,12 @@ export class Athlete {
         this.vel.x += dvx * k;
         this.vel.z += dvz * k;
       }
+    }
+    // scripted root motion (spin / layup steps): approach the override velocity quickly
+    if (m.velOverride && this.grounded) {
+      const k = Math.min(1, 26 * dt);
+      this.vel.x += (m.velOverride.x - this.vel.x) * k;
+      this.vel.z += (m.velOverride.z - this.vel.z) * k;
     }
     // root-motion impulses from moves
     this.vel.x += this.impulse.x;

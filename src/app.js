@@ -108,7 +108,6 @@ export class App {
 
   step(dt) {
     this.game.step(dt);
-    checkPickups(this.game, dt);
   }
 
   /** Advance the simulation (and camera/effects) deterministically. Used by automated tests. */

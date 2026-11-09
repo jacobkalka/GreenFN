@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { BallState } from './ball.js';
 import { Handling } from './athlete.js';
-import { BALL, HOOP, isBeyondArc } from './constants.js';
+import { BALL, HOOP, isBeyondArc, inCourtBounds } from './constants.js';
 import { JUMPSHOTS, perfectWindow, gradeRelease, computeContest, launchShot } from './shooting.js';
 import { clamp, clamp01, lerp, smoothstep, easeInOut, easeOut, rotateYaw, toLocalYaw, yawOf, angleDiff, bell } from '../core/math.js';
 import { MoveAction, MOVES, canStartMove } from './moves.js';
@@ -115,7 +115,13 @@ export class ShotAction {
     a.handling = Handling.PICKED;
     this.phase = 'gather';
     this.t = 0;
-    const st = this.style;
+    let st = this.style;
+    // right after a stepback the gather is already loaded: quicker into the shot
+    if (a.stepbackT !== undefined && this.game.time - a.stepbackT < 0.8) {
+      st = Object.assign({}, st, { gather: st.gather * 0.78 });
+      this.style = st;
+      this.afterStepback = true;
+    }
     this.ideal = st.gather + st.rel;
     const dist = a.distToRim();
     // momentum entering the shot (pull-up off the dribble)
@@ -286,7 +292,7 @@ export class ShotAction {
     const dist = a.distToRim();
     const arc = (this.style.arc + clamp((5 - dist) * 0.6, -3, 3)) * (Math.PI / 180);
     let typeMul = 1;
-    if (a.stepbackT !== undefined && game.time - a.stepbackT < 0.9) typeMul *= 1.05;
+    if (this.afterStepback) typeMul *= 1.05;
     if (this.style.fade > 0) typeMul *= 1.06;
     launchShot(game, a, {
       kind: 'jumper',
@@ -416,7 +422,7 @@ function startDribble(a) {
   a.dribble.start(a.dribble.hand || -1);
 }
 
-function startShot(game, a) {
+export function startShot(game, a) {
   if (wantsLayup(game, a)) a.setAction(new LayupAction(a, game));
   else a.setAction(new ShotAction(a, game));
 }
@@ -453,6 +459,7 @@ export function checkPickups(game, dt) {
       if (game.time - ball.shot.time < 2.5) continue;
       if (ball.shot.shooter === a) continue;
     }
+    if (game.rules && game.rules.kind === 'match' && !inCourtBounds(a.pos.x, a.pos.z, 0.12)) continue;
     // reach envelope: around the body up to standing reach + jump
     const dx = ball.pos.x - a.pos.x;
     const dz = ball.pos.z - a.pos.z;
@@ -474,10 +481,11 @@ export function checkPickups(game, dt) {
   if (best) {
     const from = ball.pos.clone();
     const prevOwnerTouch = ball.lastTouch;
+    const shot = ball.shot; // capture before giveBall clears it (rebound stats)
     game.giveBall(best, Handling.TRIPLE);
     best.setAction(new CatchAction(best, from));
     best.cooldowns.pickup = 0.25;
-    game.events.emit('ball:pickup', { athlete: best, from: prevOwnerTouch, shot: ball.shot });
+    game.events.emit('ball:pickup', { athlete: best, from: prevOwnerTouch, shot });
     return best;
   }
   return null;

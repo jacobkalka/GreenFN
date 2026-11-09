@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { Ball, BallPhysics, BallState } from './ball.js';
 import { Athlete, Handling } from './athlete.js';
 import { PLAYER, BALL, SIM_DT, BALL_SUBSTEPS, HOOP } from './constants.js';
-import { handleAthleteInput, updateAction } from './actions.js';
+import { handleAthleteInput, updateAction, checkPickups, startShot } from './actions.js';
+import { tryBlock } from './defense.js';
 import { clamp } from '../core/math.js';
 
 const _d = new THREE.Vector3();
@@ -126,7 +127,13 @@ export class Game {
       ball.noPickupFor = Math.max(0, ball.noPickupFor - dt);
     }
 
+    tryBlock(this);
+    checkPickups(this, dt);
     if (this.rules) this.rules.update(dt);
+  }
+
+  startShot(a) {
+    startShot(this, a);
   }
 
   _resolveBodies(dt) {
